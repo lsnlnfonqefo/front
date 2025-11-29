@@ -1,0 +1,35 @@
+.manlist-container {
+  width: 100%;
+}
+
+.category-tabs {
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.tab {
+  padding: 12px 30px;
+  background: white;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-radius: 4px;
+  color: #666;
+}
+
+.tab:hover {
+  border-color: #333;
+  color: #333;
+}
+
+/* Active state with black background */
+.tab.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
