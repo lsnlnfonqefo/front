@@ -199,7 +199,7 @@ export default function OrderItem({ order }) {
     try {
       await reviewService.createReview(
         selectedProduct.productId,
-        order.id,
+        selectedProduct.id,
         rating,
         content
       );
@@ -217,20 +217,29 @@ export default function OrderItem({ order }) {
       <Container>
         <OrderHeader>
           <OrderDate>
-            결제일: {new Date(order.orderDate).toLocaleDateString()}
+            결제일:{" "}
+            {new Date(order.orderDate || order.createdAt).toLocaleDateString()}
           </OrderDate>
-          <OrderAmount>₩{order.totalAmount.toLocaleString()}</OrderAmount>
+          <OrderAmount>
+            ₩{(order.totalAmount || order.totalPrice || 0).toLocaleString()}
+          </OrderAmount>
         </OrderHeader>
 
-        {order.items.map((item, index) => (
+        {(order.items || order.orderItems || []).map((item, index) => (
           <ProductItem key={index}>
-            <ProductImage src={item.productImage} alt={item.productName} />
+            <ProductImage
+              src={item.productImage || item.imageUrl}
+              alt={item.productName || item.name}
+            />
             <ProductInfo>
-              <ProductName>{item.productName}</ProductName>
+              <ProductName>{item.productName || item.name}</ProductName>
               <ProductDetails>사이즈: {item.size}</ProductDetails>
               <ProductDetails>수량: {item.quantity}개</ProductDetails>
               <ProductDetails>
-                결제금액: ₩{(item.price * item.quantity).toLocaleString()}
+                결제금액: ₩
+                {(
+                  (item.price || item.unitPrice) * item.quantity
+                ).toLocaleString()}
               </ProductDetails>
               <ReviewButton onClick={() => handleReviewClick(item)}>
                 후기작성

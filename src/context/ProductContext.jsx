@@ -1,6 +1,8 @@
 import { createContext, useState, useEffect, useCallback } from "react";
 import productService from "../api/productService";
+import { sortProducts, SortOptions } from "../utils/sortUtils";
 
+// ✅ createContext를 export와 함께 선언
 export const ProductContext = createContext();
 
 export function ProductProvider({ children }) {
@@ -19,6 +21,9 @@ export function ProductProvider({ children }) {
     categories: [],
   });
 
+  // Sort state
+  const [sortType, setSortType] = useState(SortOptions.RECOMMENDED);
+
   /**
    * Fetch products from API
    */
@@ -27,16 +32,24 @@ export function ProductProvider({ children }) {
     setError(null);
 
     try {
-      const data = await productService.getProducts(filters);
+      const data = await productService.getProducts({
+        ...filters,
+        page: 1,
+        limit: 100,
+      });
+
       setProducts(data);
-      setFilteredProducts(data);
+
+      // Apply sorting
+      const sorted = sortProducts(data, sortType);
+      setFilteredProducts(sorted);
     } catch (err) {
       setError(err.message);
       console.error("Failed to fetch products:", err);
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, sortType]);
 
   /**
    * Update filters
@@ -64,7 +77,7 @@ export function ProductProvider({ children }) {
    */
   const clearFilters = useCallback(() => {
     setFilters({
-      gender: filters.gender, // Keep gender
+      gender: filters.gender,
       sizes: [],
       materials: [],
       functions: [],
@@ -72,6 +85,13 @@ export function ProductProvider({ children }) {
       categories: [],
     });
   }, [filters.gender]);
+
+  /**
+   * Update sort type
+   */
+  const updateSort = useCallback((newSortType) => {
+    setSortType(newSortType);
+  }, []);
 
   /**
    * Get active filter count
@@ -84,7 +104,7 @@ export function ProductProvider({ children }) {
     }, 0);
   }, [filters]);
 
-  // Fetch products when filters change
+  // Fetch products when filters or sort change
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -95,9 +115,11 @@ export function ProductProvider({ children }) {
     loading,
     error,
     filters,
+    sortType,
     updateFilters,
     toggleFilter,
     clearFilters,
+    updateSort,
     getActiveFilterCount,
     refetch: fetchProducts,
   };

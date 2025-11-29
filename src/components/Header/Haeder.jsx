@@ -10,10 +10,11 @@ const HeaderRight = styled.div`
   gap: 15px;
 `;
 
+// ✅ $primary으로 변경 (transient prop)
 const AuthButton = styled.button`
   padding: 8px 16px;
-  background: ${(props) => (props.primary ? "#000" : "white")};
-  color: ${(props) => (props.primary ? "white" : "#000")};
+  background: ${(props) => (props.$primary ? "#000" : "white")};
+  color: ${(props) => (props.$primary ? "white" : "#000")};
   border: 1px solid #000;
   border-radius: 4px;
   font-size: 14px;
@@ -22,7 +23,7 @@ const AuthButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${(props) => (props.primary ? "#333" : "#f0f0f0")};
+    background: ${(props) => (props.$primary ? "#333" : "#f0f0f0")};
   }
 `;
 
@@ -98,7 +99,7 @@ export default function Header() {
               <AuthButton onClick={handleLogout}>로그아웃</AuthButton>
             </>
           ) : (
-            <AuthButton primary onClick={() => navigate("/login")}>
+            <AuthButton $primary onClick={() => navigate("/login")}>
               로그인
             </AuthButton>
           )}

@@ -11,13 +11,13 @@ const Overlay = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 999;
-  display: ${(props) => (props.isOpen ? "block" : "none")};
+  display: ${(props) => (props.$isOpen ? "block" : "none")};
 `;
 
 const Sidebar = styled.div`
   position: fixed;
   top: 0;
-  right: ${(props) => (props.isOpen ? "0" : "-400px")};
+  right: ${(props) => (props.$isOpen ? "0" : "-400px")};
   width: 400px;
   height: 100vh;
   background: white;
@@ -27,7 +27,6 @@ const Sidebar = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
 const Header = styled.div`
   padding: 20px;
   border-bottom: 1px solid #e0e0e0;
@@ -206,7 +205,7 @@ export default function CartSidebar() {
 
   const handleCheckout = async () => {
     try {
-      await orderService.createOrder(cartItems);
+      await orderService.createOrder("CARD");
       await refreshCart();
       closeCart();
       navigate("/mypage");
@@ -218,8 +217,9 @@ export default function CartSidebar() {
 
   return (
     <>
-      <Overlay isOpen={isOpen} onClick={closeCart} />
-      <Sidebar isOpen={isOpen}>
+      {/* ✅ $isOpen으로 변경 */}
+      <Overlay $isOpen={isOpen} onClick={closeCart} />
+      <Sidebar $isOpen={isOpen}>
         <Header>
           <Title>장바구니 ({cartItems.length})</Title>
           <CloseButton onClick={closeCart}>×</CloseButton>

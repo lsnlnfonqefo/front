@@ -227,3 +227,17 @@ export default function SalesStatistics() {
     </Container>
   );
 }
+// ... 기존 코드
+
+const loadStatistics = async () => {
+  setLoading(true);
+  try {
+    // from, to 파라미터로 변경
+    const data = await adminService.getSalesStatistics(startDate, endDate);
+    setStatistics(data);
+  } catch (error) {
+    console.error("Failed to load statistics:", error);
+  } finally {
+    setLoading(false);
+  }
+};

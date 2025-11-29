@@ -433,3 +433,29 @@ export default function ProductManagement({ onAddProduct }) {
     </>
   );
 }
+const handleSubmitDiscount = async () => {
+  if (!discountData.saleStartDate || !discountData.saleEndDate) {
+    alert("세일 기간을 입력해주세요.");
+    return;
+  }
+
+  if (discountData.discountRate <= 0 || discountData.discountRate > 100) {
+    alert("할인율은 1-100 사이의 값이어야 합니다.");
+    return;
+  }
+
+  try {
+    // API 파라미터 순서 수정
+    await adminService.updateDiscount(
+      selectedProduct.id,
+      discountData.discountRate,
+      discountData.saleStartDate,
+      discountData.saleEndDate
+    );
+    alert("할인 정책이 변경되었습니다.");
+    setIsModalOpen(false);
+    loadProducts();
+  } catch (error) {
+    alert("할인 정책 변경에 실패했습니다.");
+  }
+};
