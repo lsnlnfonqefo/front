@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { productAPI } from '../api';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { productAPI } from "../api";
 
 const MainPage = () => {
   const [popularProducts, setPopularProducts] = useState([]);
@@ -12,19 +12,19 @@ const MainPage = () => {
   // PPT slide5: 총 3개의 이미지, 좌우 버튼, 자동 슬라이딩 1->2->3->1->2...
   const heroImages = [
     {
-      url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1920',
-      title: '가볍고 편안한 신발',
-      subtitle: '자연에서 온 소재로 만든 올버즈',
+      url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1920",
+      title: "가볍고 편안한 신발",
+      subtitle: "자연에서 온 소재로 만든 올버즈",
     },
     {
-      url: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1920',
-      title: '지속 가능한 패션',
-      subtitle: '환경을 생각하는 친환경 슈즈',
+      url: "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=1920",
+      title: "지속 가능한 패션",
+      subtitle: "환경을 생각하는 친환경 슈즈",
     },
     {
-      url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1920',
-      title: '하루 종일 편안함',
-      subtitle: '프리미엄 울과 트리 소재',
+      url: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1920",
+      title: "하루 종일 편안함",
+      subtitle: "프리미엄 울과 트리 소재",
     },
   ];
 
@@ -46,7 +46,7 @@ const MainPage = () => {
       // productAPI가 이미 items 배열을 반환
       setPopularProducts(Array.isArray(products) ? products : []);
     } catch (error) {
-      console.error('인기 상품 조회 실패:', error);
+      console.error("인기 상품 조회 실패:", error);
       setPopularProducts([]);
     } finally {
       setLoading(false);
@@ -90,7 +90,9 @@ const MainPage = () => {
       return Number(product.finalPrice);
     }
     if (product.discountRate > 0) {
-      return Math.floor(Number(product.price) * (1 - Number(product.discountRate)));
+      return Math.floor(
+        Number(product.price) * (1 - Number(product.discountRate))
+      );
     }
     return Number(product.price);
   };
@@ -112,8 +114,12 @@ const MainPage = () => {
             </HeroSlide>
           ))}
         </HeroSlider>
-        <HeroArrow $direction="left" onClick={handlePrevHero}>‹</HeroArrow>
-        <HeroArrow $direction="right" onClick={handleNextHero}>›</HeroArrow>
+        <HeroArrow $direction="left" onClick={handlePrevHero}>
+          ‹
+        </HeroArrow>
+        <HeroArrow $direction="right" onClick={handleNextHero}>
+          ›
+        </HeroArrow>
         <HeroDots>
           {heroImages.map((_, index) => (
             <HeroDot
@@ -147,16 +153,23 @@ const MainPage = () => {
         ) : (
           <ProductSlider>
             <ProductTrack
-              style={{ transform: `translateX(-${currentSlide * (100 / visibleCount)}%)` }}
+              style={{
+                transform: `translateX(-${
+                  currentSlide * (100 / visibleCount)
+                }%)`,
+              }}
             >
               {popularProducts.map((product, index) => (
-                <ProductCard key={product.id || index} to={`/products/${product.id}`}>
+                <ProductCard
+                  key={product.id || index}
+                  to={`/products/${product.id}`}
+                >
                   <ProductRank>{index + 1}</ProductRank>
                   <ProductImageWrapper>
-                    {product.images?.[0] ? (
-                      <ProductImage 
-                        src={product.images[0]} 
-                        alt={product.name} 
+                    {product.imageUrl || product.images?.[0] ? (
+                      <ProductImage
+                        src={product.imageUrl || product.images?.[0]}
+                        alt={product.name}
                       />
                     ) : (
                       <PlaceholderImage>🖼️</PlaceholderImage>
@@ -165,11 +178,23 @@ const MainPage = () => {
                   <ProductInfo>
                     <ProductName>{product.name}</ProductName>
                     <ProductPrice>
-                      {Number(product.discountRate) > 0 && (
-                        <OriginalPrice>{formatPrice(Number(product.price))}원</OriginalPrice>
-                      )}
-                      <CurrentPrice $sale={Number(product.discountRate) > 0}>
-                        {formatPrice(getDiscountedPrice(product))}원
+                      {product.discountPrice &&
+                        Number(product.discountPrice) <
+                          Number(product.price) && (
+                          <OriginalPrice>
+                            ₩{formatPrice(Number(product.price))}
+                          </OriginalPrice>
+                        )}
+                      <CurrentPrice
+                        $sale={
+                          product.discountPrice &&
+                          Number(product.discountPrice) < Number(product.price)
+                        }
+                      >
+                        ₩
+                        {formatPrice(
+                          Number(product.discountPrice || product.price)
+                        )}
                       </CurrentPrice>
                     </ProductPrice>
                   </ProductInfo>
@@ -209,8 +234,8 @@ const MainPage = () => {
         <StoryContent>
           <StoryTitle>자연에서 온 편안함</StoryTitle>
           <StoryText>
-            올버즈는 뉴질랜드 메리노 울과 유칼립투스 나무에서 추출한 친환경 소재로
-            신발을 만듭니다. 지속 가능한 방식으로 생산된 우리의 신발은
+            올버즈는 뉴질랜드 메리노 울과 유칼립투스 나무에서 추출한 친환경
+            소재로 신발을 만듭니다. 지속 가능한 방식으로 생산된 우리의 신발은
             하루 종일 편안함을 제공합니다.
           </StoryText>
           <StoryLink to="#">우리의 이야기</StoryLink>
@@ -307,7 +332,8 @@ const HeroArrow = styled.button`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  ${({ $direction }) => ($direction === 'left' ? 'left: 20px;' : 'right: 20px;')}
+  ${({ $direction }) =>
+    $direction === "left" ? "left: 20px;" : "right: 20px;"}
   width: 50px;
   height: 50px;
   background: rgba(255, 255, 255, 0.9);
@@ -339,7 +365,8 @@ const HeroDot = styled.button`
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: ${({ $active }) => ($active ? '#fff' : 'rgba(255, 255, 255, 0.5)')};
+  background: ${({ $active }) =>
+    $active ? "#fff" : "rgba(255, 255, 255, 0.5)"};
   transition: background 0.2s;
 `;
 
@@ -493,7 +520,7 @@ const OriginalPrice = styled.span`
 const CurrentPrice = styled.span`
   font-size: 15px;
   font-weight: 600;
-  color: ${({ $sale }) => ($sale ? '#F44336' : '#212121')};
+  color: ${({ $sale }) => ($sale ? "#F44336" : "#212121")};
 `;
 
 const CategorySection = styled.section`

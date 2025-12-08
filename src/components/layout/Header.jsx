@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const Header = () => {
   const [activeMenu, setActiveMenu] = useState(null);
@@ -12,85 +12,104 @@ const Header = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <HeaderWrapper>
-      {/* 상단 바 */}
-      <TopBar>
-        <span>COMFY, LOW-KEY LUXURY | 남성 영상</span>
-      </TopBar>
-
       <NavContainer>
         <Logo to="/">allbirds</Logo>
 
         <NavMenu>
-          {/* PPT slide3: 남성 hover시 서브메뉴 */}
+          {/* 남성 hover시 서브메뉴 */}
           <NavItem
-            onMouseEnter={() => setActiveMenu('men')}
+            onMouseEnter={() => setActiveMenu("men")}
             onMouseLeave={() => setActiveMenu(null)}
           >
             <NavLink as="span">남성</NavLink>
-            {activeMenu === 'men' && (
-              <MegaMenu>
-                <MenuColumn>
-                  <ColumnTitle>신제품</ColumnTitle>
-                  <MenuItem to="/products?category=new">크루저 미드 익스플로어</MenuItem>
-                  <MenuItem to="/products?category=new">코듀로이 슬립온</MenuItem>
-                  <MenuItem to="/products?category=new">울 크루저</MenuItem>
-                  <MenuItem to="/products?category=new">트리 러너 NZ</MenuItem>
-                  <MenuItem to="/products?category=new">울 크루저 슬립온</MenuItem>
-                  <MenuItem to="/products?category=new">울 러너 NZ</MenuItem>
-                </MenuColumn>
-                <MenuColumn>
-                  <ColumnTitle>남성 신발</ColumnTitle>
-                  <MenuItem to="/products">전체</MenuItem>
-                  <MenuItem to="/products?category=new">가을 컬렉션</MenuItem>
-                  <MenuItem to="/products?category=lifestyle">라이프스타일</MenuItem>
-                  <MenuItem to="/products">액티브</MenuItem>
-                  <MenuItem to="/products?category=slipon">슬립온</MenuItem>
-                  <MenuItem to="/products?category=sale">세일</MenuItem>
-                </MenuColumn>
-                <MenuColumn>
-                  <ColumnTitle>의류 & 악세사리</ColumnTitle>
-                  <MenuItem to="#">양말</MenuItem>
-                  <MenuItem to="#">의류</MenuItem>
-                  <MenuItem to="#">악세사리</MenuItem>
-                </MenuColumn>
-              </MegaMenu>
+            {activeMenu === "men" && (
+              <FullWidthMegaMenu>
+                <MegaMenuInner>
+                  <MenuColumn>
+                    <ColumnTitle>신제품</ColumnTitle>
+                    <MenuItemWithBar to="/products?category=new">
+                      크루저 미드 익스플로어
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=new">
+                      코듀로이 슬립온
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=new">
+                      울 크루저
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=new">
+                      트리 러너 NZ
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=new">
+                      울 크루저 슬립온
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=new">
+                      울 러너 NZ
+                    </MenuItemWithBar>
+                  </MenuColumn>
+                  <MenuColumn>
+                    <ColumnTitle>남성 신발</ColumnTitle>
+                    <MenuItemWithBar to="/products">전체</MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=new">
+                      가을 컬렉션
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=lifestyle">
+                      라이프스타일
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products">액티브</MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=slipon">
+                      슬립온
+                    </MenuItemWithBar>
+                    <MenuItemWithBar to="/products?category=sale">
+                      세일
+                    </MenuItemWithBar>
+                  </MenuColumn>
+                  <MenuColumn>
+                    <ColumnTitle>의류 & 악세사리</ColumnTitle>
+                    <MenuItemWithBar to="#">양말</MenuItemWithBar>
+                    <MenuItemWithBar to="#">의류</MenuItemWithBar>
+                    <MenuItemWithBar to="#">악세사리</MenuItemWithBar>
+                  </MenuColumn>
+                </MegaMenuInner>
+              </FullWidthMegaMenu>
             )}
           </NavItem>
 
-          {/* PPT slide4: 지속 가능성 hover시 서브메뉴 + 애니메이션 */}
+          {/* 지속 가능성 hover시 서브메뉴 */}
           <NavItem
-            onMouseEnter={() => setActiveMenu('sustainability')}
+            onMouseEnter={() => setActiveMenu("sustainability")}
             onMouseLeave={() => setActiveMenu(null)}
           >
             <NavLink as="span">지속 가능성</NavLink>
-            {activeMenu === 'sustainability' && (
-              <MegaMenu>
-                <MenuColumn>
-                  <ColumnTitle>올버즈</ColumnTitle>
-                  {/* PPT: 올버즈, 스토리, 소식 hover시 오른쪽으로 이동 애니메이션 */}
-                  <AnimatedMenuItem to="#">브랜드 스토리</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">지속 가능성</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">소재</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">수선</AnimatedMenuItem>
-                </MenuColumn>
-                <MenuColumn>
-                  <ColumnTitle>스토리</ColumnTitle>
-                  <AnimatedMenuItem to="#">올앰버스</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">올버즈 앰배서더</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">ReRun</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">신발 관리 방법</AnimatedMenuItem>
-                </MenuColumn>
-                <MenuColumn>
-                  <ColumnTitle>소식</ColumnTitle>
-                  <AnimatedMenuItem to="#">캠페인</AnimatedMenuItem>
-                  <AnimatedMenuItem to="#">뉴스</AnimatedMenuItem>
-                </MenuColumn>
-              </MegaMenu>
+            {activeMenu === "sustainability" && (
+              <FullWidthMegaMenu>
+                <MegaMenuInner>
+                  <MenuColumn>
+                    <ColumnTitle>올버즈</ColumnTitle>
+                    <MenuItemWithBar to="#">브랜드 스토리</MenuItemWithBar>
+                    <MenuItemWithBar to="#">지속 가능성</MenuItemWithBar>
+                    <MenuItemWithBar to="#">소재</MenuItemWithBar>
+                    <MenuItemWithBar to="#">수선</MenuItemWithBar>
+                  </MenuColumn>
+                  <MenuColumn>
+                    <ColumnTitle>스토리</ColumnTitle>
+                    <MenuItemWithBar to="#">M0.0NSHOT</MenuItemWithBar>
+                    <MenuItemWithBar to="#">올멤버스</MenuItemWithBar>
+                    <MenuItemWithBar to="#">올버즈 앰배서더</MenuItemWithBar>
+                    <MenuItemWithBar to="#">ReRun</MenuItemWithBar>
+                    <MenuItemWithBar to="#">신발 관리 방법</MenuItemWithBar>
+                  </MenuColumn>
+                  <MenuColumn>
+                    <ColumnTitle>소식</ColumnTitle>
+                    <MenuItemWithBar to="#">캠페인</MenuItemWithBar>
+                    <MenuItemWithBar to="#">뉴스</MenuItemWithBar>
+                  </MenuColumn>
+                </MegaMenuInner>
+              </FullWidthMegaMenu>
             )}
           </NavItem>
         </NavMenu>
@@ -99,12 +118,20 @@ const Header = () => {
           {user ? (
             <>
               <UserName>안녕하세요, {user.name}님</UserName>
-              {isAdmin && <HeaderButton as={Link} to="/admin">관리자</HeaderButton>}
-              <HeaderButton as={Link} to="/mypage">마이페이지</HeaderButton>
+              {isAdmin && (
+                <HeaderButton as={Link} to="/admin">
+                  관리자
+                </HeaderButton>
+              )}
+              <HeaderButton as={Link} to="/mypage">
+                마이페이지
+              </HeaderButton>
               <HeaderButton onClick={handleLogout}>로그아웃</HeaderButton>
             </>
           ) : (
-            <HeaderButton as={Link} to="/login">로그인</HeaderButton>
+            <HeaderButton as={Link} to="/login">
+              로그인
+            </HeaderButton>
           )}
           <CartButton onClick={toggleCart}>
             🛒
@@ -123,14 +150,7 @@ const HeaderWrapper = styled.header`
   top: 0;
   z-index: 1000;
   background: #fff;
-`;
-
-const TopBar = styled.div`
-  background: #212121;
-  color: #fff;
-  text-align: center;
-  padding: 8px;
-  font-size: 12px;
+  border-bottom: 1px solid #e0e0e0;
 `;
 
 const NavContainer = styled.nav`
@@ -139,11 +159,12 @@ const NavContainer = styled.nav`
   justify-content: space-between;
   padding: 0 40px;
   height: 60px;
-  border-bottom: 1px solid #e0e0e0;
+  max-width: 1400px;
+  margin: 0 auto;
 `;
 
 const Logo = styled(Link)`
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
   font-size: 24px;
   font-style: italic;
   color: #212121;
@@ -169,53 +190,72 @@ const NavLink = styled(Link)`
   }
 `;
 
-/* PPT: 메가 메뉴 - 3열 구조 */
-const MegaMenu = styled.div`
-  position: absolute;
-  top: 100%;
-  left: -100px;
+/* 전체 너비 메가메뉴 */
+const FullWidthMegaMenu = styled.div`
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
   background: #fff;
-  display: flex;
-  gap: 48px;
-  padding: 32px 40px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-top: 1px solid #e0e0e0;
-  min-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+`;
+
+const MegaMenuInner = styled.div`
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  gap: 120px;
+  padding: 40px 60px;
 `;
 
 const MenuColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-`;
+  gap: 8px;
+  min-width: 150px;
+  opacity: 0;
+  transform: translateX(-30px);
+  animation: slideIn 0.5s ease forwards;
 
-const ColumnTitle = styled.h3`
-  font-size: 14px;
-  font-weight: 700;
-  color: #212121;
-  margin-bottom: 8px;
-`;
+  &:nth-child(1) {
+    animation-delay: 0s;
+  }
+  &:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
 
-const MenuItem = styled(Link)`
-  font-size: 13px;
-  color: #757575;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #212121;
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 `;
 
-/* PPT slide4: hover시 오른쪽으로 이동 애니메이션 */
-const AnimatedMenuItem = styled(Link)`
-  font-size: 13px;
+const ColumnTitle = styled.h3`
+  font-size: 16px;
+  font-weight: 700;
+  color: #212121;
+  margin-bottom: 16px;
+`;
+
+/* 왼쪽 세로 바가 있는 메뉴 아이템 */
+const MenuItemWithBar = styled(Link)`
+  font-size: 14px;
   color: #757575;
-  transition: all 0.3s ease;
-  display: inline-block;
+  padding: 6px 0 6px 12px;
+  border-left: 2px solid #e0e0e0;
+  transition: all 0.2s;
+  display: block;
 
   &:hover {
-    color: #2E7D32;
-    transform: translateX(8px);
+    color: #212121;
+    border-left-color: #212121;
   }
 `;
 

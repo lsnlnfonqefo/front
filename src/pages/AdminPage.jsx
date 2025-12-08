@@ -1,47 +1,47 @@
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { adminAPI } from '../api';
+import { useState, useEffect } from "react";
+import styled from "styled-components";
+import { adminAPI } from "../api";
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState("products");
   const [products, setProducts] = useState([]);
   const [sales, setSales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  
+
   // 모달 상태
   const [showProductModal, setShowProductModal] = useState(false);
   const [showSizeModal, setShowSizeModal] = useState(false);
   const [showDiscountModal, setShowDiscountModal] = useState(false);
-  
+
   // PPT slide21: 상품 등록 폼
   const [newProduct, setNewProduct] = useState({
-    name: '',
-    description: '',
-    price: '',
-    material: 'tree',
+    name: "",
+    description: "",
+    price: "",
+    material: "tree",
     categories: [],
     sizes: [],
-    imageUrls: [''],
+    imageUrls: [""],
   });
 
   // PPT slide21: 가용사이즈 변경 폼
   const [sizeForm, setSizeForm] = useState([]);
-  
+
   // PPT slide21: 할인정책 변경 폼
-  const [discountForm, setDiscountForm] = useState({ 
-    discountRate: 0, 
-    saleStart: '', 
-    saleEnd: '' 
+  const [discountForm, setDiscountForm] = useState({
+    discountRate: 0,
+    saleStart: "",
+    saleEnd: "",
   });
-  
+
   // PPT slide21: 판매현황 기간 필터
-  const [salesFilter, setSalesFilter] = useState({ from: '', to: '' });
+  const [salesFilter, setSalesFilter] = useState({ from: "", to: "" });
 
   useEffect(() => {
-    if (activeTab === 'products') {
+    if (activeTab === "products") {
       fetchProducts();
-    } else if (activeTab === 'sales') {
+    } else if (activeTab === "sales") {
       fetchSales();
     }
   }, [activeTab]);
@@ -53,7 +53,7 @@ const AdminPage = () => {
       // adminAPI가 이미 배열을 반환
       setProducts(Array.isArray(productList) ? productList : []);
     } catch (error) {
-      console.error('상품 목록 조회 실패:', error);
+      console.error("상품 목록 조회 실패:", error);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -64,11 +64,14 @@ const AdminPage = () => {
   const fetchSales = async () => {
     setLoading(true);
     try {
-      const salesList = await adminAPI.getSales(salesFilter.from, salesFilter.to);
+      const salesList = await adminAPI.getSales(
+        salesFilter.from,
+        salesFilter.to
+      );
       // adminAPI가 이미 배열을 반환
       setSales(Array.isArray(salesList) ? salesList : []);
     } catch (error) {
-      console.error('매출 현황 조회 실패:', error);
+      console.error("매출 현황 조회 실패:", error);
       setSales([]);
     } finally {
       setLoading(false);
@@ -78,7 +81,7 @@ const AdminPage = () => {
   // PPT slide21: 상품 등록
   const handleCreateProduct = async () => {
     if (!newProduct.name || !newProduct.price) {
-      alert('상품명과 가격은 필수입니다.');
+      alert("상품명과 가격은 필수입니다.");
       return;
     }
 
@@ -90,22 +93,22 @@ const AdminPage = () => {
         material: newProduct.material,
         categories: newProduct.categories,
         sizes: newProduct.sizes.map(Number),
-        imageUrls: newProduct.imageUrls.filter(url => url.trim()),
+        imageUrls: newProduct.imageUrls.filter((url) => url.trim()),
       });
-      alert('상품이 등록되었습니다.');
+      alert("상품이 등록되었습니다.");
       setShowProductModal(false);
       setNewProduct({
-        name: '',
-        description: '',
-        price: '',
-        material: 'tree',
+        name: "",
+        description: "",
+        price: "",
+        material: "tree",
         categories: [],
         sizes: [],
-        imageUrls: [''],
+        imageUrls: [""],
       });
       fetchProducts();
     } catch (error) {
-      alert('상품 등록에 실패했습니다.');
+      alert("상품 등록에 실패했습니다.");
     }
   };
 
@@ -113,11 +116,11 @@ const AdminPage = () => {
   const handleUpdateSizes = async () => {
     try {
       await adminAPI.updateSizes(selectedProduct.id, sizeForm.map(Number));
-      alert('가용 사이즈가 변경되었습니다.');
+      alert("가용 사이즈가 변경되었습니다.");
       setShowSizeModal(false);
       fetchProducts();
     } catch (error) {
-      alert('사이즈 변경에 실패했습니다.');
+      alert("사이즈 변경에 실패했습니다.");
     }
   };
 
@@ -130,17 +133,19 @@ const AdminPage = () => {
         discountForm.saleStart,
         discountForm.saleEnd
       );
-      alert('할인 정책이 변경되었습니다.');
+      alert("할인 정책이 변경되었습니다.");
       setShowDiscountModal(false);
       fetchProducts();
     } catch (error) {
-      alert('할인 정책 변경에 실패했습니다.');
+      alert("할인 정책 변경에 실패했습니다.");
     }
   };
 
   const openSizeModal = (product) => {
     setSelectedProduct(product);
-    setSizeForm(product.sizes?.map(s => typeof s === 'object' ? s.size : s) || []);
+    setSizeForm(
+      product.sizes?.map((s) => (typeof s === "object" ? s.size : s)) || []
+    );
     setShowSizeModal(true);
   };
 
@@ -148,8 +153,8 @@ const AdminPage = () => {
     setSelectedProduct(product);
     setDiscountForm({
       discountRate: (product.discountRate || 0) * 100,
-      saleStart: product.saleStart?.split('T')[0] || '',
-      saleEnd: product.saleEnd?.split('T')[0] || '',
+      saleStart: product.saleStart?.split("T")[0] || "",
+      saleEnd: product.saleEnd?.split("T")[0] || "",
     });
     setShowDiscountModal(true);
   };
@@ -158,10 +163,29 @@ const AdminPage = () => {
     return price?.toLocaleString() || 0;
   };
 
-  const sizeOptions = ['250', '255', '260', '265', '270', '275', '280', '285', '290'];
+  const sizeOptions = [
+    "220",
+    "230",
+    "240",
+    "250",
+    "255",
+    "260",
+    "265",
+    "270",
+    "275",
+    "280",
+    "285",
+    "290",
+    "295",
+    "300",
+    "305",
+    "310",
+    "315",
+    "320",
+  ];
   const categoryOptions = [
-    { value: 'lifestyle', label: '라이프스타일' },
-    { value: 'slipon', label: '슬립온' },
+    { value: "lifestyle", label: "라이프스타일" },
+    { value: "slipon", label: "슬립온" },
   ];
 
   return (
@@ -171,16 +195,22 @@ const AdminPage = () => {
       </PageHeader>
 
       <TabContainer>
-        <Tab $active={activeTab === 'products'} onClick={() => setActiveTab('products')}>
+        <Tab
+          $active={activeTab === "products"}
+          onClick={() => setActiveTab("products")}
+        >
           상품 관리
         </Tab>
-        <Tab $active={activeTab === 'sales'} onClick={() => setActiveTab('sales')}>
+        <Tab
+          $active={activeTab === "sales"}
+          onClick={() => setActiveTab("sales")}
+        >
           판매 현황
         </Tab>
       </TabContainer>
 
       <ContentWrapper>
-        {activeTab === 'products' && (
+        {activeTab === "products" && (
           <ProductManagement>
             <ToolBar>
               <h2>등록된 상품</h2>
@@ -191,7 +221,9 @@ const AdminPage = () => {
             </ToolBar>
 
             {loading ? (
-              <LoadingWrapper><Spinner /></LoadingWrapper>
+              <LoadingWrapper>
+                <Spinner />
+              </LoadingWrapper>
             ) : (
               <ProductTable>
                 <thead>
@@ -210,8 +242,13 @@ const AdminPage = () => {
                       <td>
                         <TableImage>
                           {product.imageUrls?.[0] ? (
-                            <img src={product.imageUrls[0]} alt={product.name} />
-                          ) : '🖼️'}
+                            <img
+                              src={product.imageUrls[0]}
+                              alt={product.name}
+                            />
+                          ) : (
+                            "🖼️"
+                          )}
                         </TableImage>
                       </td>
                       <td>{product.name}</td>
@@ -225,7 +262,9 @@ const AdminPage = () => {
                             사이즈 변경
                           </ActionButton>
                           {/* PPT slide21: 할인정책 변경 */}
-                          <ActionButton onClick={() => openDiscountModal(product)}>
+                          <ActionButton
+                            onClick={() => openDiscountModal(product)}
+                          >
                             할인 설정
                           </ActionButton>
                         </ActionButtons>
@@ -239,7 +278,7 @@ const AdminPage = () => {
         )}
 
         {/* PPT slide21: 판매현황 */}
-        {activeTab === 'sales' && (
+        {activeTab === "sales" && (
           <SalesManagement>
             <ToolBar>
               <h2>판매 현황</h2>
@@ -247,33 +286,52 @@ const AdminPage = () => {
                 <FilterInput
                   type="date"
                   value={salesFilter.from}
-                  onChange={(e) => setSalesFilter((prev) => ({ ...prev, from: e.target.value }))}
+                  onChange={(e) =>
+                    setSalesFilter((prev) => ({
+                      ...prev,
+                      from: e.target.value,
+                    }))
+                  }
                 />
                 <span>~</span>
                 <FilterInput
                   type="date"
                   value={salesFilter.to}
-                  onChange={(e) => setSalesFilter((prev) => ({ ...prev, to: e.target.value }))}
+                  onChange={(e) =>
+                    setSalesFilter((prev) => ({ ...prev, to: e.target.value }))
+                  }
                 />
                 <FilterButton onClick={fetchSales}>조회</FilterButton>
               </FilterGroup>
             </ToolBar>
 
             {loading ? (
-              <LoadingWrapper><Spinner /></LoadingWrapper>
+              <LoadingWrapper>
+                <Spinner />
+              </LoadingWrapper>
             ) : (
               <>
                 <SalesSummary>
                   <SummaryCard>
                     <SummaryLabel>총 매출</SummaryLabel>
                     <SummaryValue>
-                      {formatPrice(sales.reduce((sum, s) => sum + (s.totalRevenue || s.revenue || 0), 0))}원
+                      {formatPrice(
+                        sales.reduce(
+                          (sum, s) => sum + (s.totalRevenue || s.revenue || 0),
+                          0
+                        )
+                      )}
+                      원
                     </SummaryValue>
                   </SummaryCard>
                   <SummaryCard>
                     <SummaryLabel>총 판매 수량</SummaryLabel>
                     <SummaryValue>
-                      {sales.reduce((sum, s) => sum + (s.totalQuantity || s.quantity || 0), 0)}개
+                      {sales.reduce(
+                        (sum, s) => sum + (s.totalQuantity || s.quantity || 0),
+                        0
+                      )}
+                      개
                     </SummaryValue>
                   </SummaryCard>
                 </SalesSummary>
@@ -291,7 +349,9 @@ const AdminPage = () => {
                       <tr key={index}>
                         <td>{sale.productName || sale.product?.name}</td>
                         <td>{sale.totalQuantity || sale.quantity}개</td>
-                        <td>{formatPrice(sale.totalRevenue || sale.revenue)}원</td>
+                        <td>
+                          {formatPrice(sale.totalRevenue || sale.revenue)}원
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -309,14 +369,18 @@ const AdminPage = () => {
           <Modal>
             <ModalHeader>
               <ModalTitle>새 상품 등록</ModalTitle>
-              <ModalClose onClick={() => setShowProductModal(false)}>✕</ModalClose>
+              <ModalClose onClick={() => setShowProductModal(false)}>
+                ✕
+              </ModalClose>
             </ModalHeader>
             <ModalContent>
               <FormGroup>
                 <Label>상품명 *</Label>
                 <Input
                   value={newProduct.name}
-                  onChange={(e) => setNewProduct((prev) => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   placeholder="상품명을 입력하세요"
                 />
               </FormGroup>
@@ -324,7 +388,12 @@ const AdminPage = () => {
                 <Label>상품 설명</Label>
                 <Textarea
                   value={newProduct.description}
-                  onChange={(e) => setNewProduct((prev) => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewProduct((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   placeholder="상품 설명을 입력하세요"
                   rows={3}
                 />
@@ -335,7 +404,12 @@ const AdminPage = () => {
                   <Input
                     type="number"
                     value={newProduct.price}
-                    onChange={(e) => setNewProduct((prev) => ({ ...prev, price: e.target.value }))}
+                    onChange={(e) =>
+                      setNewProduct((prev) => ({
+                        ...prev,
+                        price: e.target.value,
+                      }))
+                    }
                     placeholder="가격"
                   />
                 </FormGroup>
@@ -343,7 +417,12 @@ const AdminPage = () => {
                   <Label>소재 *</Label>
                   <Select
                     value={newProduct.material}
-                    onChange={(e) => setNewProduct((prev) => ({ ...prev, material: e.target.value }))}
+                    onChange={(e) =>
+                      setNewProduct((prev) => ({
+                        ...prev,
+                        material: e.target.value,
+                      }))
+                    }
                   >
                     <option value="tree">Tree</option>
                     <option value="wool">Wool</option>
@@ -367,7 +446,9 @@ const AdminPage = () => {
                           } else {
                             setNewProduct((prev) => ({
                               ...prev,
-                              categories: prev.categories.filter((c) => c !== cat.value),
+                              categories: prev.categories.filter(
+                                (c) => c !== cat.value
+                              ),
                             }));
                           }
                         }}
@@ -413,17 +494,22 @@ const AdminPage = () => {
                       onChange={(e) => {
                         const newUrls = [...newProduct.imageUrls];
                         newUrls[index] = e.target.value;
-                        setNewProduct((prev) => ({ ...prev, imageUrls: newUrls }));
+                        setNewProduct((prev) => ({
+                          ...prev,
+                          imageUrls: newUrls,
+                        }));
                       }}
                       placeholder="이미지 URL을 입력하세요"
                     />
                     {index === newProduct.imageUrls.length - 1 && (
                       <AddImageButton
                         type="button"
-                        onClick={() => setNewProduct((prev) => ({
-                          ...prev,
-                          imageUrls: [...prev.imageUrls, ''],
-                        }))}
+                        onClick={() =>
+                          setNewProduct((prev) => ({
+                            ...prev,
+                            imageUrls: [...prev.imageUrls, ""],
+                          }))
+                        }
                       >
                         +
                       </AddImageButton>
@@ -433,8 +519,12 @@ const AdminPage = () => {
               </FormGroup>
             </ModalContent>
             <ModalFooter>
-              <CancelButton onClick={() => setShowProductModal(false)}>취소</CancelButton>
-              <SubmitButton onClick={handleCreateProduct}>등록하기</SubmitButton>
+              <CancelButton onClick={() => setShowProductModal(false)}>
+                취소
+              </CancelButton>
+              <SubmitButton onClick={handleCreateProduct}>
+                등록하기
+              </SubmitButton>
             </ModalFooter>
           </Modal>
         </>
@@ -470,7 +560,9 @@ const AdminPage = () => {
               </SizeCheckboxGroup>
             </ModalContent>
             <ModalFooter>
-              <CancelButton onClick={() => setShowSizeModal(false)}>취소</CancelButton>
+              <CancelButton onClick={() => setShowSizeModal(false)}>
+                취소
+              </CancelButton>
               <SubmitButton onClick={handleUpdateSizes}>저장</SubmitButton>
             </ModalFooter>
           </Modal>
@@ -484,7 +576,9 @@ const AdminPage = () => {
           <Modal>
             <ModalHeader>
               <ModalTitle>할인 정책 변경</ModalTitle>
-              <ModalClose onClick={() => setShowDiscountModal(false)}>✕</ModalClose>
+              <ModalClose onClick={() => setShowDiscountModal(false)}>
+                ✕
+              </ModalClose>
             </ModalHeader>
             <ModalContent>
               <ProductNameDisplay>{selectedProduct?.name}</ProductNameDisplay>
@@ -495,10 +589,12 @@ const AdminPage = () => {
                   min="0"
                   max="100"
                   value={discountForm.discountRate}
-                  onChange={(e) => setDiscountForm((prev) => ({
-                    ...prev,
-                    discountRate: parseInt(e.target.value) || 0,
-                  }))}
+                  onChange={(e) =>
+                    setDiscountForm((prev) => ({
+                      ...prev,
+                      discountRate: parseInt(e.target.value) || 0,
+                    }))
+                  }
                 />
               </FormGroup>
               <FormRow>
@@ -507,7 +603,12 @@ const AdminPage = () => {
                   <Input
                     type="date"
                     value={discountForm.saleStart}
-                    onChange={(e) => setDiscountForm((prev) => ({ ...prev, saleStart: e.target.value }))}
+                    onChange={(e) =>
+                      setDiscountForm((prev) => ({
+                        ...prev,
+                        saleStart: e.target.value,
+                      }))
+                    }
                   />
                 </FormGroup>
                 <FormGroup>
@@ -515,13 +616,20 @@ const AdminPage = () => {
                   <Input
                     type="date"
                     value={discountForm.saleEnd}
-                    onChange={(e) => setDiscountForm((prev) => ({ ...prev, saleEnd: e.target.value }))}
+                    onChange={(e) =>
+                      setDiscountForm((prev) => ({
+                        ...prev,
+                        saleEnd: e.target.value,
+                      }))
+                    }
                   />
                 </FormGroup>
               </FormRow>
             </ModalContent>
             <ModalFooter>
-              <CancelButton onClick={() => setShowDiscountModal(false)}>취소</CancelButton>
+              <CancelButton onClick={() => setShowDiscountModal(false)}>
+                취소
+              </CancelButton>
               <SubmitButton onClick={handleUpdateDiscount}>저장</SubmitButton>
             </ModalFooter>
           </Modal>
@@ -560,8 +668,9 @@ const Tab = styled.button`
   padding: 12px 24px;
   font-size: 15px;
   font-weight: 500;
-  color: ${({ $active }) => ($active ? '#212121' : '#757575')};
-  border-bottom: 2px solid ${({ $active }) => ($active ? '#212121' : 'transparent')};
+  color: ${({ $active }) => ($active ? "#212121" : "#757575")};
+  border-bottom: 2px solid
+    ${({ $active }) => ($active ? "#212121" : "transparent")};
   margin-bottom: -1px;
   transition: all 0.2s;
 
@@ -642,7 +751,9 @@ const Spinner = styled.div`
   animation: spin 0.8s linear infinite;
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -650,7 +761,8 @@ const ProductTable = styled.table`
   width: 100%;
   border-collapse: collapse;
 
-  th, td {
+  th,
+  td {
     padding: 16px;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
@@ -726,7 +838,8 @@ const SalesTable = styled.table`
   width: 100%;
   border-collapse: collapse;
 
-  th, td {
+  th,
+  td {
     padding: 16px;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
@@ -885,9 +998,9 @@ const SizeCheckboxGroup = styled.div`
 
 const SizeCheckbox = styled.button`
   padding: 8px 14px;
-  border: 1px solid ${({ $selected }) => ($selected ? '#212121' : '#e0e0e0')};
-  background: ${({ $selected }) => ($selected ? '#212121' : '#fff')};
-  color: ${({ $selected }) => ($selected ? '#fff' : '#212121')};
+  border: 1px solid ${({ $selected }) => ($selected ? "#212121" : "#e0e0e0")};
+  background: ${({ $selected }) => ($selected ? "#212121" : "#fff")};
+  color: ${({ $selected }) => ($selected ? "#fff" : "#212121")};
   border-radius: 4px;
   font-size: 13px;
   transition: all 0.2s;

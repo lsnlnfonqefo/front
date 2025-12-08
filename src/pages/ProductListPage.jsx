@@ -1,42 +1,47 @@
-import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import styled from 'styled-components';
-import { productAPI } from '../api';
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import styled from "styled-components";
+import { productAPI } from "../api";
 
 const ProductListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // PPT slide5: 필터링 - 가용 사이즈, 소재
+
   const [activeFilters, setActiveFilters] = useState({
     sizes: [],
     materials: [],
   });
-  
-  // PPT slide6: 정렬
-  const [sortBy, setSortBy] = useState('recommended');
+
+  const [sortBy, setSortBy] = useState("recommended");
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
-  // PPT slide4: 신제품, 라이프스타일, 세일, 슬립온만 다룸
-  const currentCategory = searchParams.get('category') || 'all';
+  const currentCategory = searchParams.get("category") || "all";
 
-  // PPT slide5: 가용 사이즈 (250~290)
-  const sizeOptions = ['250', '255', '260', '265', '270', '275', '280', '285', '290'];
-
-  // PPT slide5: 소재 - Tree(가볍고 시원한), Wool(부드럽고 따뜻한)
+  const sizeOptions = [
+    "250",
+    "255",
+    "260",
+    "265",
+    "270",
+    "275",
+    "280",
+    "285",
+    "290",
+  ];
   const materialOptions = [
-    { value: 'tree', label: '가볍고 시원한 Tree' },
-    { value: 'wool', label: '부드럽고 따뜻한 Wool' },
+    { value: "tree", label: "가볍고 시원한 tree" },
+    { value: "cotton", label: "면" },
+    { value: "wool", label: "부드럽고 따뜻한 wool" },
+    { value: "canvas", label: "캔버스" },
   ];
 
-  // 정렬 옵션
   const sortOptions = [
-    { value: 'recommended', label: '추천순' },
-    { value: 'sales', label: '판매순' },
-    { value: 'priceAsc', label: '가격 낮은 순' },
-    { value: 'priceDesc', label: '가격 높은 순' },
-    { value: 'newest', label: '최신 등록 순' },
+    { value: "recommended", label: "추천순" },
+    { value: "sales", label: "판매순" },
+    { value: "priceAsc", label: "가격 낮은 순" },
+    { value: "priceDesc", label: "가격 높은 순" },
+    { value: "newest", label: "최신 등록 순" },
   ];
 
   useEffect(() => {
@@ -47,33 +52,33 @@ const ProductListPage = () => {
     setLoading(true);
     try {
       const params = {};
-      
-      // 카테고리 필터
-      if (currentCategory && currentCategory !== 'all') {
-        if (currentCategory === 'new') {
+
+      if (currentCategory && currentCategory !== "all") {
+        if (currentCategory === "new") {
           params.isNew = true;
-        } else if (currentCategory === 'sale') {
+        } else if (currentCategory === "sale") {
           params.isSale = true;
         } else {
           params.category = currentCategory;
         }
       }
-      
-      // PPT slide5: 사이즈 필터 (각 항목은 OR)
+
       if (activeFilters.sizes.length > 0) {
-        params.size = activeFilters.sizes.join(',');
+        params.size = activeFilters.sizes.join(",");
       }
-      
-      // PPT slide5: 소재 필터 (각 항목은 OR)
+
       if (activeFilters.materials.length > 0) {
-        params.material = activeFilters.materials.join(',');
+        params.material = activeFilters.materials.join(",");
       }
 
       const productList = await productAPI.getProducts(params);
-      const sorted = sortProducts(Array.isArray(productList) ? productList : [], sortBy);
+      const sorted = sortProducts(
+        Array.isArray(productList) ? productList : [],
+        sortBy
+      );
       setProducts(sorted);
     } catch (error) {
-      console.error('상품 조회 실패:', error);
+      console.error("상품 조회 실패:", error);
       setProducts([]);
     } finally {
       setLoading(false);
@@ -83,55 +88,56 @@ const ProductListPage = () => {
   const sortProducts = (list, sort) => {
     const sorted = [...list];
     switch (sort) {
-      case 'priceAsc':
-        return sorted.sort((a, b) => getDiscountedPrice(a) - getDiscountedPrice(b));
-      case 'priceDesc':
-        return sorted.sort((a, b) => getDiscountedPrice(b) - getDiscountedPrice(a));
-      case 'newest':
-        return sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      case 'sales':
+      case "priceAsc":
+        return sorted.sort(
+          (a, b) => getDiscountedPrice(a) - getDiscountedPrice(b)
+        );
+      case "priceDesc":
+        return sorted.sort(
+          (a, b) => getDiscountedPrice(b) - getDiscountedPrice(a)
+        );
+      case "newest":
+        return sorted.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      case "sales":
         return sorted.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0));
       default:
         return sorted;
     }
   };
 
-  // PPT slide5: 사이즈 필터 토글
   const toggleSizeFilter = (size) => {
-    setActiveFilters(prev => ({
+    setActiveFilters((prev) => ({
       ...prev,
       sizes: prev.sizes.includes(size)
-        ? prev.sizes.filter(s => s !== size)
+        ? prev.sizes.filter((s) => s !== size)
         : [...prev.sizes, size],
     }));
   };
 
-  // PPT slide5: 소재 필터 토글
   const toggleMaterialFilter = (material) => {
-    setActiveFilters(prev => ({
+    setActiveFilters((prev) => ({
       ...prev,
       materials: prev.materials.includes(material)
-        ? prev.materials.filter(m => m !== material)
+        ? prev.materials.filter((m) => m !== material)
         : [...prev.materials, material],
     }));
   };
 
-  // PPT slide5: 개별 필터 제거
   const removeFilter = (type, value) => {
-    setActiveFilters(prev => ({
+    setActiveFilters((prev) => ({
       ...prev,
-      [type]: prev[type].filter(v => v !== value),
+      [type]: prev[type].filter((v) => v !== value),
     }));
   };
 
-  // PPT slide5: 전체 필터 초기화
   const clearAllFilters = () => {
     setActiveFilters({ sizes: [], materials: [] });
   };
 
-  // 카테고리 변경
   const handleCategoryChange = (category) => {
-    if (category === 'all') {
+    if (category === "all") {
       setSearchParams({});
     } else {
       setSearchParams({ category });
@@ -141,7 +147,9 @@ const ProductListPage = () => {
   const getDiscountedPrice = (product) => {
     if (product.finalPrice) return Number(product.finalPrice);
     if (Number(product.discountRate) > 0) {
-      return Math.floor(Number(product.price) * (1 - Number(product.discountRate)));
+      return Math.floor(
+        Number(product.price) * (1 - Number(product.discountRate))
+      );
     }
     return Number(product.price);
   };
@@ -150,78 +158,114 @@ const ProductListPage = () => {
 
   const getCategoryTitle = () => {
     switch (currentCategory) {
-      case 'new': return '신제품';
-      case 'lifestyle': return '라이프스타일';
-      case 'sale': return '세일';
-      case 'slipon': return '슬립온';
-      default: return '남성 신발';
+      case "new":
+        return "신제품";
+      case "lifestyle":
+        return "라이프스타일";
+      case "sale":
+        return "세일";
+      case "slipon":
+        return "슬립온";
+      default:
+        return "남성 신발";
     }
   };
 
-  const hasActiveFilters = activeFilters.sizes.length > 0 || activeFilters.materials.length > 0;
+  const hasActiveFilters =
+    activeFilters.sizes.length > 0 || activeFilters.materials.length > 0;
+
+  const isNewProduct = (createdAt) => {
+    if (!createdAt) return false;
+    const created = new Date(createdAt);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    return created > oneMonthAgo;
+  };
 
   return (
     <PageWrapper>
-      {/* 브레드크럼 */}
       <Breadcrumb>
         <span>Home</span> &gt; <span>남성 전체 제품</span>
       </Breadcrumb>
 
-      {/* PPT slide4: 신제품, 라이프스타일, 세일, 슬립온 탭 */}
-      <CategoryTabs>
-        <CategoryTab 
-          $active={currentCategory === 'all'} 
-          onClick={() => handleCategoryChange('all')}
-        >
-          신발 ×
-        </CategoryTab>
-        <CategoryTab 
-          $active={currentCategory === 'new'} 
-          onClick={() => handleCategoryChange('new')}
-        >
-          신제품
-        </CategoryTab>
-        <CategoryTab 
-          $active={currentCategory === 'lifestyle'} 
-          onClick={() => handleCategoryChange('lifestyle')}
-        >
-          라이프스타일
-        </CategoryTab>
-        <CategoryTab 
-          $active={currentCategory === 'sale'} 
-          onClick={() => handleCategoryChange('sale')}
-        >
-          세일
-        </CategoryTab>
-        <CategoryTab 
-          $active={currentCategory === 'slipon'} 
-          onClick={() => handleCategoryChange('slipon')}
-        >
-          슬립온
-        </CategoryTab>
-      </CategoryTabs>
+      <GenderTabs>
+        <GenderTab $active={true}>남성</GenderTab>
+        <GenderTab $active={false}>여성</GenderTab>
+      </GenderTabs>
 
       <PageTitle>{getCategoryTitle()}</PageTitle>
       <PageDescription>
-        당신의 하루를 함께하는 라이프스타일 신발 컬렉션. 편안한 착화감과 세련된 디자인으로 언제 어디서나 활용할 수 있습니다.
+        Wool, Tree, Sugar 등 자연 소재로 만들어 놀랍도록 편안한 올버즈 제품을
+        만나보세요. 우리는 편안한 신발의 기준을 만들어가고 있습니다.
       </PageDescription>
 
+      <CategoryTabs>
+        <CategoryTab
+          $active={currentCategory === "all"}
+          onClick={() => handleCategoryChange("all")}
+        >
+          신발 ×
+        </CategoryTab>
+        <CategoryTab
+          $active={currentCategory === "new"}
+          onClick={() => handleCategoryChange("new")}
+        >
+          신제품
+        </CategoryTab>
+        <CategoryTab
+          $active={currentCategory === "lifestyle"}
+          onClick={() => handleCategoryChange("lifestyle")}
+        >
+          라이프스타일
+        </CategoryTab>
+        <CategoryTab
+          $active={currentCategory === "active"}
+          onClick={() => handleCategoryChange("active")}
+        >
+          액티브
+        </CategoryTab>
+        <CategoryTab
+          $active={currentCategory === "sale"}
+          onClick={() => handleCategoryChange("sale")}
+        >
+          세일
+        </CategoryTab>
+        <CategoryTab
+          $active={currentCategory === "slipon"}
+          onClick={() => handleCategoryChange("slipon")}
+        >
+          슬립온
+        </CategoryTab>
+        <CategoryTab
+          $active={currentCategory === "slipper"}
+          onClick={() => handleCategoryChange("slipper")}
+        >
+          슬리퍼
+        </CategoryTab>
+      </CategoryTabs>
+
+      <Divider />
+
       <ContentWrapper>
-        {/* 좌측 필터 */}
         <FilterSection>
-          {/* PPT slide5: 적용된 필터 표시 */}
           {hasActiveFilters && (
             <AppliedFilters>
               <AppliedTitle>적용된 필터</AppliedTitle>
               <AppliedList>
-                {activeFilters.sizes.map(size => (
-                  <AppliedTag key={size} onClick={() => removeFilter('sizes', size)}>
+                {activeFilters.sizes.map((size) => (
+                  <AppliedTag
+                    key={size}
+                    onClick={() => removeFilter("sizes", size)}
+                  >
                     {size} ×
                   </AppliedTag>
                 ))}
-                {activeFilters.materials.map(material => (
-                  <AppliedTag key={material} onClick={() => removeFilter('materials', material)}>
-                    {materialOptions.find(m => m.value === material)?.label} ×
+                {activeFilters.materials.map((material) => (
+                  <AppliedTag
+                    key={material}
+                    onClick={() => removeFilter("materials", material)}
+                  >
+                    {materialOptions.find((m) => m.value === material)?.label} ×
                   </AppliedTag>
                 ))}
               </AppliedList>
@@ -229,11 +273,10 @@ const ProductListPage = () => {
             </AppliedFilters>
           )}
 
-          {/* PPT slide5: 사이즈 필터 */}
           <FilterGroup>
             <FilterTitle>사이즈</FilterTitle>
-            <SizeGrid>
-              {sizeOptions.map(size => (
+            <SizeFilterGrid>
+              {sizeOptions.map((size) => (
                 <SizeButton
                   key={size}
                   $active={activeFilters.sizes.includes(size)}
@@ -242,14 +285,13 @@ const ProductListPage = () => {
                   {size}
                 </SizeButton>
               ))}
-            </SizeGrid>
+            </SizeFilterGrid>
           </FilterGroup>
 
-          {/* PPT slide5: 소재 필터 */}
           <FilterGroup>
             <FilterTitle>소재</FilterTitle>
             <MaterialList>
-              {materialOptions.map(material => (
+              {materialOptions.map((material) => (
                 <MaterialItem key={material.value}>
                   <Checkbox
                     type="checkbox"
@@ -263,18 +305,18 @@ const ProductListPage = () => {
           </FilterGroup>
         </FilterSection>
 
-        {/* 상품 목록 */}
         <ProductSection>
           <ProductHeader>
             <ProductCount>{products.length}개 제품</ProductCount>
-            {/* 정렬 드롭다운 */}
             <SortDropdown>
-              <SortButton onClick={() => setShowSortDropdown(!showSortDropdown)}>
-                {sortOptions.find(o => o.value === sortBy)?.label} ▼
+              <SortButton
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+              >
+                {sortOptions.find((o) => o.value === sortBy)?.label} ▼
               </SortButton>
               {showSortDropdown && (
                 <SortMenu>
-                  {sortOptions.map(option => (
+                  {sortOptions.map((option) => (
                     <SortOption
                       key={option.value}
                       $active={sortBy === option.value}
@@ -292,35 +334,72 @@ const ProductListPage = () => {
           </ProductHeader>
 
           {loading ? (
-            <LoadingWrapper><Spinner /></LoadingWrapper>
+            <LoadingWrapper>
+              <Spinner />
+            </LoadingWrapper>
           ) : products.length === 0 ? (
             <EmptyState>조건에 맞는 상품이 없습니다.</EmptyState>
           ) : (
             <ProductGrid>
-              {products.map(product => (
+              {products.map((product) => (
                 <ProductCard key={product.id} to={`/products/${product.id}`}>
                   <ProductImageWrapper>
                     {product.images?.[0] ? (
-                      <ProductImage src={product.images[0]} alt={product.name} />
+                      <ProductImage
+                        src={product.images[0]}
+                        alt={product.name}
+                      />
                     ) : (
                       <PlaceholderImage>🖼️</PlaceholderImage>
                     )}
-                    {/* 신제품 배지 (1달 이내) */}
-                    {isNewProduct(product.createdAt) && <NewBadge>NEW</NewBadge>}
-                    {/* 세일 배지 */}
-                    {Number(product.discountRate) > 0 && (
-                      <SaleBadge>{Math.round(Number(product.discountRate) * 100)}%</SaleBadge>
+                    {isNewProduct(product.createdAt) && (
+                      <NewBadge>NEW</NewBadge>
                     )}
+                    {Number(product.discountRate) > 0 && (
+                      <SaleBadge>
+                        {Math.round(Number(product.discountRate) * 100)}%
+                      </SaleBadge>
+                    )}
+                    <SizeOverlay>
+                      <SizeGrid>
+                        {(product.sizes || []).map((size) => (
+                          <SizeChip key={size}>{size}</SizeChip>
+                        ))}
+                      </SizeGrid>
+                    </SizeOverlay>
                   </ProductImageWrapper>
+                  <ColorThumbnails>
+                    {(product.images || []).slice(0, 5).map((img, idx) => (
+                      <ColorThumb key={idx} src={img} alt="" />
+                    ))}
+                    {(product.images?.length || 0) > 5 && (
+                      <MoreColors>›</MoreColors>
+                    )}
+                  </ColorThumbnails>
                   <ProductInfo>
                     <ProductName>{product.name}</ProductName>
+                    <ProductTags>
+                      {(product.categories || []).join(", ") ||
+                        "캐주얼, 라이프스타일"}
+                    </ProductTags>
                     <ProductPrice>
-                      {Number(product.discountRate) > 0 && (
-                        <OriginalPrice>{formatPrice(Number(product.price))}원</OriginalPrice>
+                      {Number(product.discountRate) > 0 ? (
+                        <>
+                          <DiscountRate>
+                            {Math.round(Number(product.discountRate) * 100)}%
+                          </DiscountRate>
+                          <CurrentPrice $sale>
+                            ₩{formatPrice(getDiscountedPrice(product))}
+                          </CurrentPrice>
+                          <OriginalPrice>
+                            ₩{formatPrice(Number(product.price))}
+                          </OriginalPrice>
+                        </>
+                      ) : (
+                        <CurrentPrice>
+                          ₩{formatPrice(Number(product.price))}
+                        </CurrentPrice>
                       )}
-                      <CurrentPrice $sale={Number(product.discountRate) > 0}>
-                        {formatPrice(getDiscountedPrice(product))}원
-                      </CurrentPrice>
                     </ProductPrice>
                   </ProductInfo>
                 </ProductCard>
@@ -331,15 +410,6 @@ const ProductListPage = () => {
       </ContentWrapper>
     </PageWrapper>
   );
-};
-
-// PPT: 신제품 = 등록일 기준 1달 이내
-const isNewProduct = (createdAt) => {
-  if (!createdAt) return false;
-  const created = new Date(createdAt);
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  return created > oneMonthAgo;
 };
 
 export default ProductListPage;
@@ -357,25 +427,25 @@ const Breadcrumb = styled.div`
   margin-bottom: 20px;
 `;
 
-/* PPT slide4: 카테고리 탭 */
-const CategoryTabs = styled.div`
+const GenderTabs = styled.div`
   display: flex;
-  gap: 8px;
   margin-bottom: 24px;
-  flex-wrap: wrap;
 `;
 
-const CategoryTab = styled.button`
-  padding: 8px 16px;
-  border: 1px solid ${({ $active }) => ($active ? '#212121' : '#e0e0e0')};
-  background: ${({ $active }) => ($active ? '#212121' : '#fff')};
-  color: ${({ $active }) => ($active ? '#fff' : '#212121')};
-  border-radius: 20px;
-  font-size: 13px;
-  transition: all 0.2s;
+const GenderTab = styled.button`
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  background: ${({ $active }) => ($active ? "#212121" : "#fff")};
+  color: ${({ $active }) => ($active ? "#fff" : "#212121")};
+  border: 1px solid #212121;
 
-  &:hover {
-    border-color: #212121;
+  &:first-child {
+    border-radius: 20px 0 0 20px;
+  }
+  &:last-child {
+    border-radius: 0 20px 20px 0;
+    border-left: none;
   }
 `;
 
@@ -389,21 +459,45 @@ const PageDescription = styled.p`
   font-size: 14px;
   color: #757575;
   margin-bottom: 32px;
-  max-width: 600px;
+  max-width: 700px;
+  line-height: 1.6;
+`;
+
+const CategoryTabs = styled.div`
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const CategoryTab = styled.button`
+  padding: 8px 16px;
+  border: 1px solid ${({ $active }) => ($active ? "#212121" : "#e0e0e0")};
+  background: ${({ $active }) => ($active ? "#212121" : "#fff")};
+  color: ${({ $active }) => ($active ? "#fff" : "#212121")};
+  border-radius: 20px;
+  font-size: 13px;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #212121;
+  }
+`;
+
+const Divider = styled.hr`
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 24px 0;
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
-  gap: 40px;
+  gap: 30px;
 `;
 
-/* 좌측 필터 */
 const FilterSection = styled.aside`
-  width: 220px;
+  width: 180px;
   flex-shrink: 0;
 `;
-
-/* PPT slide5: 적용된 필터 */
 const AppliedFilters = styled.div`
   margin-bottom: 24px;
   padding-bottom: 24px;
@@ -428,9 +522,6 @@ const AppliedTag = styled.button`
   background: #f5f5f5;
   border-radius: 4px;
   font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 
   &:hover {
     background: #e0e0e0;
@@ -457,20 +548,19 @@ const FilterTitle = styled.h3`
   margin-bottom: 16px;
 `;
 
-/* PPT slide5: 사이즈 그리드 */
-const SizeGrid = styled.div`
+const SizeFilterGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
 `;
 
 const SizeButton = styled.button`
-  padding: 10px;
-  border: 1px solid ${({ $active }) => ($active ? '#212121' : '#e0e0e0')};
-  background: ${({ $active }) => ($active ? '#212121' : '#fff')};
-  color: ${({ $active }) => ($active ? '#fff' : '#212121')};
+  padding: 8px 4px;
+  border: 1px solid ${({ $active }) => ($active ? "#212121" : "#e0e0e0")};
+  background: ${({ $active }) => ($active ? "#212121" : "#fff")};
+  color: ${({ $active }) => ($active ? "#fff" : "#212121")};
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 12px;
   transition: all 0.2s;
 
   &:hover {
@@ -497,7 +587,6 @@ const Checkbox = styled.input`
   height: 16px;
 `;
 
-/* 상품 섹션 */
 const ProductSection = styled.main`
   flex: 1;
 `;
@@ -549,7 +638,7 @@ const SortOption = styled.button`
   padding: 10px 16px;
   text-align: left;
   font-size: 13px;
-  background: ${({ $active }) => ($active ? '#f5f5f5' : '#fff')};
+  background: ${({ $active }) => ($active ? "#f5f5f5" : "#fff")};
 
   &:hover {
     background: #f5f5f5;
@@ -571,7 +660,9 @@ const Spinner = styled.div`
   animation: spin 0.8s linear infinite;
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -584,11 +675,23 @@ const EmptyState = styled.div`
 const ProductGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
 `;
 
 const ProductCard = styled(Link)`
   display: block;
+`;
+
+const SizeOverlay = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 12px;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
 `;
 
 const ProductImageWrapper = styled.div`
@@ -598,15 +701,20 @@ const ProductImageWrapper = styled.div`
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 12px;
+
+  &:hover ${SizeOverlay} {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `;
 
 const ProductImage = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
 
-  ${ProductCard}:hover & {
+  ${ProductImageWrapper}:hover & {
     transform: scale(1.05);
   }
 `;
@@ -644,19 +752,69 @@ const SaleBadge = styled.span`
   border-radius: 4px;
 `;
 
+const SizeGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+`;
+
+const SizeChip = styled.span`
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 12px;
+  background: #fff;
+`;
+
+const ColorThumbnails = styled.div`
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+`;
+
+const ColorThumb = styled.img`
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+`;
+
+const MoreColors = styled.span`
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #757575;
+`;
+
 const ProductInfo = styled.div``;
 
 const ProductName = styled.h3`
   font-size: 14px;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   color: #212121;
+`;
+
+const ProductTags = styled.p`
+  font-size: 12px;
+  color: #757575;
+  margin-bottom: 8px;
 `;
 
 const ProductPrice = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+`;
+
+const DiscountRate = styled.span`
+  color: #c62828;
+  font-weight: 600;
+  font-size: 14px;
 `;
 
 const OriginalPrice = styled.span`
@@ -668,5 +826,5 @@ const OriginalPrice = styled.span`
 const CurrentPrice = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: ${({ $sale }) => ($sale ? '#c62828' : '#212121')};
+  color: ${({ $sale }) => ($sale ? "#c62828" : "#212121")};
 `;
