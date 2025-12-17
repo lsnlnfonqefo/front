@@ -4,7 +4,7 @@ import axios from 'axios';
 // 프로덕션에서는 환경 변수 사용
 const isDevelopment = import.meta.env.DEV;
 const baseURL = isDevelopment
-  ? '/api' // 프록시를 통해 요청
+  ? '/api' // Vite 프록시가 /api로 시작하는 요청을 자동으로 프록시
   : `${import.meta.env.VITE_API_BASE_URL || 'http://54.180.130.171'}/api`;
 
 const api = axios.create({

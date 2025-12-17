@@ -88,7 +88,7 @@ const CartSidebar = () => {
                   </ItemInfo>
                   <ItemRight>
                     <RemoveButton onClick={() => handleRemove(item.id)}>✕</RemoveButton>
-                    <ItemPrice>₩{formatPrice(item.price * item.quantity)}</ItemPrice>
+                    <ItemPrice>₩{formatPrice(item.finalPrice * item.quantity)}</ItemPrice>
                   </ItemRight>
                 </CartItem>
               ))}

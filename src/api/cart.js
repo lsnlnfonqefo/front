@@ -4,8 +4,13 @@ export const cartAPI = {
   // GET /api/cart - 장바구니 조회
   getCart: async () => {
     const response = await api.get('/cart');
-    // 응답: { success: true, data: { items: [...], total: n } }
-    return response.data?.data || { items: [], total: 0 };
+    // 응답: { success: true, data: { items: [...], totalPrice: n } }
+    const cartData = response.data?.data || { items: [], totalPrice: 0 };
+    // totalPrice를 total로 변환하여 프론트엔드에서 사용
+    return {
+      items: cartData.items || [],
+      total: Number(cartData.totalPrice || 0)
+    };
   },
 
   // POST /api/cart/items - 장바구니에 상품 추가

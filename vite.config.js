@@ -11,7 +11,8 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL || 'http://54.180.130.171',
+          // 로컬 개발: localhost:3000, 배포: EC2 서버
+          target: env.VITE_API_BASE_URL || 'http://localhost:3000',
           changeOrigin: true,
           secure: false,
           // 쿠키와 인증 헤더를 포함한 요청을 위해 필요
