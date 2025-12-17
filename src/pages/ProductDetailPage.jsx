@@ -56,14 +56,18 @@ const ProductDetailPage = () => {
     }
   };
 
-  const formatPrice = (price) => price?.toLocaleString() || 0;
+  const formatPrice = (price) => (Number(price) || 0).toLocaleString();
 
-  const getDiscountedPrice = () => {
-    if (product?.finalPrice) return Number(product.finalPrice);
-    if (Number(product?.discountRate) > 0) {
-      return Math.floor(Number(product.price) * (1 - Number(product.discountRate)));
-    }
-    return Number(product?.price) || 0;
+  // 백엔드에서 price=할인가(현재가), originalPrice=정가로 내려주므로
+  // 상세페이지에서는 그 값을 그대로 사용한다.
+  const getPrices = () => {
+    const current = Number(product?.finalPrice ?? product?.price ?? 0);
+    const original = Number(product?.originalPrice ?? product?.price ?? 0);
+    return {
+      current,
+      original,
+      hasDiscount: Number(product?.discountRate) > 0 && current < original,
+    };
   };
 
   // 리뷰 별점
@@ -84,7 +88,7 @@ const ProductDetailPage = () => {
   const images = product.images || [];
   const sizes = product.sizes || [];
   const reviews = product.reviews || [];
-  const hasDiscount = Number(product.discountRate) > 0;
+  const { current: currentPrice, original: originalPrice, hasDiscount } = getPrices();
 
   return (
     <PageWrapper>
@@ -123,11 +127,11 @@ const ProductDetailPage = () => {
             {hasDiscount ? (
               <>
                 <DiscountBadge>{Math.round(Number(product.discountRate) * 100)}%</DiscountBadge>
-                <CurrentPrice>₩{formatPrice(getDiscountedPrice())}</CurrentPrice>
-                <OriginalPrice>₩{formatPrice(Number(product.price))}</OriginalPrice>
+                <CurrentPrice>₩{formatPrice(currentPrice)}</CurrentPrice>
+                <OriginalPrice>₩{formatPrice(originalPrice)}</OriginalPrice>
               </>
             ) : (
-              <CurrentPrice>₩{formatPrice(Number(product.price))}</CurrentPrice>
+              <CurrentPrice>₩{formatPrice(currentPrice)}</CurrentPrice>
             )}
           </PriceSection>
 
@@ -176,7 +180,7 @@ const ProductDetailPage = () => {
                 <QuantityButton onClick={() => setQuantity(q => q + 1)}>+</QuantityButton>
               </QuantityControl>
               <AddToCartButton onClick={handleAddToCart}>
-                장바구니 담기 · ₩{formatPrice(getDiscountedPrice() * quantity)}
+                장바구니 담기 · ₩{formatPrice(currentPrice * quantity)}
               </AddToCartButton>
             </CartSection>
           )}
