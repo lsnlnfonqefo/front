@@ -141,11 +141,23 @@ const AdminProductList = () => {
         // 각 상품의 편집 상태 초기화
         const states = {};
         response.data.items?.forEach(product => {
+          // saleStart, saleEnd가 날짜 객체인 경우 문자열로 변환
+          const saleStartStr = product.saleStart 
+            ? (typeof product.saleStart === 'string' 
+                ? product.saleStart 
+                : new Date(product.saleStart).toISOString().split('T')[0])
+            : '';
+          const saleEndStr = product.saleEnd 
+            ? (typeof product.saleEnd === 'string' 
+                ? product.saleEnd 
+                : new Date(product.saleEnd).toISOString().split('T')[0])
+            : '';
+          
           states[product.id] = {
             sizes: product.sizes?.join(',') || '',
             discountRate: product.discountRate || 0,
-            saleStart: product.saleStart || '',
-            saleEnd: product.saleEnd || '',
+            saleStart: saleStartStr,
+            saleEnd: saleEndStr,
           };
         });
         setEditingStates(states);
@@ -199,15 +211,26 @@ const AdminProductList = () => {
       await updateProductSizes(productId, sizesArray);
 
       // 할인 정책 업데이트
+      // state.discountRate는 이미 0~1 사이 값으로 저장되어 있음 (onChange에서 /100 처리됨)
+      // 예: 사용자가 10 입력 → onChange에서 0.1로 변환하여 저장
+      // 따라서 그대로 사용하면 됨
+      const discountRateValue = parseFloat(state.discountRate) || 0;
+      
+      // 0~1 사이 값인지 확인
+      if (discountRateValue < 0 || discountRateValue > 1) {
+        throw new Error('할인율은 0과 1 사이의 값이어야 합니다.');
+      }
+      
       const discountPayload = {
-        discountRate: parseFloat(state.discountRate),
+        discountRate: discountRateValue,
         saleStart: state.saleStart || null,
         saleEnd: state.saleEnd || null,
       };
-
-      if (discountPayload.discountRate < 0 || discountPayload.discountRate > 1) {
-        throw new Error('할인율은 0과 1 사이의 값이어야 합니다.');
-      }
+      
+      console.log('할인 정책 업데이트:', {
+        stateDiscountRate: state.discountRate,
+        finalDiscountRate: discountPayload.discountRate
+      });
 
       if (discountPayload.saleStart && discountPayload.saleEnd) {
         if (new Date(discountPayload.saleEnd) < new Date(discountPayload.saleStart)) {
@@ -274,7 +297,7 @@ const AdminProductList = () => {
             <tr key={product.id}>
               <Td>{product.id}</Td>
               <Td>{product.name}</Td>
-              <Td>{product.price?.toLocaleString()}원</Td>
+              <Td>{Math.floor(product.price || 0).toLocaleString()}원</Td>
               <Td>{(product.discountRate * 100).toFixed(0)}%</Td>
               <Td>{product.categories?.join(', ') || '-'}</Td>
               <Td>{product.sizes?.join(', ') || '-'}</Td>
@@ -294,11 +317,17 @@ const AdminProductList = () => {
                   <Input
                     type="number"
                     min="0"
-                    max="1"
-                    step="0.01"
-                    value={editingStates[product.id]?.discountRate || 0}
-                    onChange={(e) => handleDiscountChange(product.id, 'discountRate', e.target.value)}
-                    placeholder="할인율"
+                    max="100"
+                    step="1"
+                    value={editingStates[product.id]?.discountRate !== undefined 
+                      ? (editingStates[product.id].discountRate * 100).toFixed(0)
+                      : (product.discountRate * 100).toFixed(0)}
+                    onChange={(e) => {
+                      // 퍼센트 값을 받아서 0~1 사이 값으로 변환하여 저장
+                      const percentValue = parseFloat(e.target.value) || 0;
+                      handleDiscountChange(product.id, 'discountRate', percentValue / 100);
+                    }}
+                    placeholder="할인율 (%)"
                     style={{ width: '80px' }}
                   />
                   <Input
