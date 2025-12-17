@@ -1,0 +1,71 @@
+const theme = {
+  colors: {
+    primary: '#212121',
+    secondary: '#757575',
+    accent: '#2E7D32',
+    white: '#FFFFFF',
+    black: '#000000',
+    gray: {
+      100: '#F5F5F5',
+      200: '#EEEEEE',
+      300: '#E0E0E0',
+      400: '#BDBDBD',
+      500: '#9E9E9E',
+      600: '#757575',
+      700: '#616161',
+      800: '#424242',
+      900: '#212121',
+    },
+    success: '#4CAF50',
+    error: '#F44336',
+    warning: '#FF9800',
+    info: '#2196F3',
+  },
+  fonts: {
+    primary: "'Noto Sans KR', sans-serif",
+  },
+  fontSizes: {
+    xs: '0.75rem',
+    sm: '0.875rem',
+    md: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    '2xl': '1.5rem',
+    '3xl': '1.875rem',
+    '4xl': '2.25rem',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    '2xl': '3rem',
+    '3xl': '4rem',
+  },
+  breakpoints: {
+    mobile: '480px',
+    tablet: '768px',
+    laptop: '1024px',
+    desktop: '1280px',
+  },
+  shadows: {
+    sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    md: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    lg: '0 10px 15px rgba(0, 0, 0, 0.1)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.15)',
+  },
+  transitions: {
+    fast: '0.15s ease',
+    normal: '0.3s ease',
+    slow: '0.5s ease',
+  },
+  zIndex: {
+    dropdown: 100,
+    sticky: 200,
+    modal: 300,
+    tooltip: 400,
+  },
+};
+
+export default theme;
