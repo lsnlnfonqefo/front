@@ -221,7 +221,7 @@ export default function OrderItem({ order }) {
             {new Date(order.orderDate || order.createdAt).toLocaleDateString()}
           </OrderDate>
           <OrderAmount>
-            ₩{(order.totalAmount || order.totalPrice || 0).toLocaleString()}
+            ₩{Number(order.totalAmount || order.totalPrice || 0).toLocaleString()}
           </OrderAmount>
         </OrderHeader>
 
@@ -238,7 +238,7 @@ export default function OrderItem({ order }) {
               <ProductDetails>
                 결제금액: ₩
                 {(
-                  (item.price || item.unitPrice) * item.quantity
+                  Number(item.finalPrice || item.price || item.unitPrice || 0) * Number(item.quantity || 1)
                 ).toLocaleString()}
               </ProductDetails>
               <ReviewButton onClick={() => handleReviewClick(item)}>
