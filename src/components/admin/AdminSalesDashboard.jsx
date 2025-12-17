@@ -173,6 +173,30 @@ const AdminSalesDashboard = () => {
         <LoadingText>로딩 중...</LoadingText>
       ) : (
         <>
+          {salesData.length > 0 && (
+            <div style={{ 
+              marginBottom: '20px', 
+              padding: '15px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '4px',
+              border: '1px solid #dee2e6'
+            }}>
+              <div style={{ 
+                fontSize: '18px', 
+                fontWeight: '600', 
+                color: '#333',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span>총 매출:</span>
+                <span style={{ color: '#3498db', fontSize: '20px' }}>
+                  {Math.floor(salesData.reduce((sum, item) => sum + (Number(item.totalRevenue) || 0), 0)).toLocaleString()}원
+                </span>
+              </div>
+            </div>
+          )}
+          
           <Table>
             <thead>
               <tr>
@@ -188,7 +212,7 @@ const AdminSalesDashboard = () => {
                   <Td>{item.productId}</Td>
                   <Td>{item.name}</Td>
                   <Td>{item.totalQuantity}</Td>
-                  <Td>{item.totalRevenue?.toLocaleString()}원</Td>
+                  <Td>{Math.floor(item.totalRevenue || 0).toLocaleString()}원</Td>
                 </tr>
               ))}
             </tbody>

@@ -166,7 +166,8 @@ const AdminProductForm = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  const categories = ['lifestyle', 'slipon', 'sneakers', 'boots', 'sandal'];
+  // 백엔드에서 허용하는 카테고리: new, lifestyle, sale, slipon
+  const categories = ['new', 'lifestyle', 'sale', 'slipon'];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -216,11 +217,15 @@ const AdminProductForm = () => {
       if (!formData.name.trim()) {
         throw new Error('제품명을 입력해주세요.');
       }
-      if (parseFloat(formData.price) < 0) {
-        throw new Error('가격은 0 이상이어야 합니다.');
+      const priceValue = parseFloat(formData.price);
+      if (isNaN(priceValue) || priceValue < 0) {
+        throw new Error('가격은 0 이상의 숫자여야 합니다.');
       }
-      if (formData.discountRate < 0 || formData.discountRate > 1) {
-        throw new Error('할인율은 0과 1 사이의 값이어야 합니다.');
+      if (priceValue > 99999999) {
+        throw new Error('가격은 99,999,999원을 초과할 수 없습니다.');
+      }
+      if (formData.discountRate < 0 || formData.discountRate > 100) {
+        throw new Error('할인율은 0과 100 사이의 값이어야 합니다.');
       }
       if (formData.categories.length === 0) {
         throw new Error('최소 하나의 카테고리를 선택해주세요.');
@@ -241,7 +246,8 @@ const AdminProductForm = () => {
         name: formData.name.trim(),
         description: formData.description.trim(),
         price: parseFloat(formData.price),
-        discountRate: parseFloat(formData.discountRate),
+        // 퍼센트 값을 0~1 사이 값으로 변환 (예: 10% → 0.1)
+        discountRate: (parseFloat(formData.discountRate) || 0) / 100,
         categories: formData.categories,
         sizes: sizesArray,
         material: formData.material.trim(),
@@ -249,6 +255,12 @@ const AdminProductForm = () => {
         saleStart: formData.saleStart || null,
         saleEnd: formData.saleEnd || null,
       };
+
+      // 디버깅: 전송할 데이터 확인
+      console.log('📤 Sending product data:', {
+        ...payload,
+        imageUrls: payload.imageUrls.map(url => url.substring(0, 50) + '...'), // URL 길이 제한
+      });
 
       if (payload.saleStart && payload.saleEnd) {
         if (new Date(payload.saleEnd) < new Date(payload.saleStart)) {
@@ -308,26 +320,32 @@ const AdminProductForm = () => {
         </FormGroup>
 
         <FormGroup>
-          <Label>가격 *</Label>
+          <Label>가격 (원) *</Label>
           <Input
             type="number"
             min="0"
-            step="1000"
+            max="99999999"
+            step="1"
             value={formData.price}
             onChange={(e) => handleInputChange('price', e.target.value)}
+            placeholder="예: 99000"
             required
           />
+          <small style={{ color: '#666', fontSize: '12px', display: 'block', marginTop: '4px' }}>
+            최대 99,999,999원까지 입력 가능합니다.
+          </small>
         </FormGroup>
 
         <FormGroup>
-          <Label>할인율 (0~1) *</Label>
+          <Label>할인율 (%) *</Label>
           <Input
             type="number"
             min="0"
-            max="1"
-            step="0.01"
+            max="100"
+            step="1"
             value={formData.discountRate}
             onChange={(e) => handleInputChange('discountRate', e.target.value)}
+            placeholder="예: 10 (10% 할인)"
             required
           />
         </FormGroup>

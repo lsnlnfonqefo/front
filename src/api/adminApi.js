@@ -14,6 +14,8 @@ adminApi.interceptors.request.use(
   (config) => {
     const cookies = document.cookie;
     const fullURL = config.baseURL ? `${config.baseURL}${config.url}` : config.url;
+    const hasSessionCookie = cookies.includes('sessionId');
+    
     console.log('🚀 API Request:', {
       method: config.method?.toUpperCase(),
       url: config.url,
@@ -21,7 +23,14 @@ adminApi.interceptors.request.use(
       data: config.data,
       withCredentials: config.withCredentials,
       cookies: cookies || 'none',
+      hasSessionCookie: hasSessionCookie,
     });
+    
+    // 세션이 필요한 요청인데 쿠키가 없으면 경고
+    if (!hasSessionCookie && !config.url?.includes('/api/auth/login')) {
+      console.warn('⚠️ Request without session cookie:', config.url);
+    }
+    
     return config;
   },
   (error) => {
@@ -55,6 +64,9 @@ adminApi.interceptors.response.use(
     }
     const cookies = document.cookie;
     
+    // 로그인 응답인 경우 쿠키 정보를 더 자세히 로그
+    const isLoginResponse = response.config.url?.includes('/api/auth/login');
+    
     console.log('✅ API Response:', {
       status: response.status,
       url: response.config.url,
@@ -66,6 +78,22 @@ adminApi.interceptors.response.use(
       allHeaders: Object.keys(allHeaders).length > 0 ? allHeaders : 'use responseHeaders object',
       responseHeadersKeys: Object.keys(response.headers || {}),
     });
+    
+    // 로그인 성공 시 쿠키 확인
+    if (isLoginResponse && response.data?.success) {
+      console.log('🍪 Login Response - Cookie Check:', {
+        hasSetCookie: !!(setCookieHeader1 || setCookieHeader2 || setCookieHeader3),
+        setCookieValue: setCookieHeader1 || setCookieHeader2 || setCookieHeader3,
+        documentCookies: document.cookie,
+        allResponseHeaders: response.headers,
+      });
+      
+      // 쿠키가 설정되지 않았다면 경고
+      if (!setCookieHeader1 && !setCookieHeader2 && !setCookieHeader3) {
+        console.warn('⚠️ WARNING: Set-Cookie header not found in login response!');
+      }
+    }
+    
     return response;
   },
   (error) => {
@@ -77,6 +105,16 @@ adminApi.interceptors.response.use(
       data: error.response?.data,
       message: error.message,
     });
+    
+    // 500 에러인 경우 상세 정보 출력
+    if (error.response?.status === 500) {
+      console.error('🔴 500 Internal Server Error Details:', {
+        message: error.response?.data?.message,
+        code: error.response?.data?.code,
+        error: error.response?.data?.error,
+        fullResponse: JSON.stringify(error.response?.data, null, 2),
+      });
+    }
     
     if (error.response?.status === 401) {
       // 로그인 API는 401 에러를 그대로 전달
@@ -120,7 +158,9 @@ export const updateProductSizes = async (productId, sizes) => {
  * @returns {Promise}
  */
 export const updateProductDiscount = async (productId, payload) => {
+  console.log('updateProductDiscount 호출:', { productId, payload });
   const response = await adminApi.patch(`/api/admin/products/${productId}/discount`, payload);
+  console.log('updateProductDiscount 응답:', response.data);
   return response.data;
 };
 
@@ -130,8 +170,23 @@ export const updateProductDiscount = async (productId, payload) => {
  * @returns {Promise}
  */
 export const createProduct = async (payload) => {
-  const response = await adminApi.post('/api/admin/products', payload);
-  return response.data;
+  console.log('📦 createProduct payload:', {
+    ...payload,
+    imageUrls: payload.imageUrls?.map(url => url.substring(0, 50) + '...'),
+  });
+  
+  try {
+    const response = await adminApi.post('/api/admin/products', payload);
+    console.log('✅ createProduct success:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('❌ createProduct error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    });
+    throw error;
+  }
 };
 
 /**
